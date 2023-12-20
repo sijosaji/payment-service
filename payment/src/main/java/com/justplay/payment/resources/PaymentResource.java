@@ -2,6 +2,8 @@ package com.justplay.payment.resources;
 
 import com.justplay.payment.model.OrderCreateRequest;
 import com.justplay.payment.model.OrderResponse;
+import com.justplay.payment.model.RefundRequest;
+import com.justplay.payment.model.RefundResponse;
 import com.justplay.payment.services.PaymentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,13 @@ public class PaymentResource {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("createTransaction")
+    @PostMapping("create-transaction")
     public OrderResponse createTransaction(@RequestBody OrderCreateRequest orderCreateRequest) {
         return paymentService.createOrder(orderCreateRequest);
+    }
+
+    @PostMapping("initiate-refund")
+    public RefundResponse initiateRefund(@RequestBody RefundRequest refundRequest) {
+        return paymentService.initiateRefund(refundRequest);
     }
 }

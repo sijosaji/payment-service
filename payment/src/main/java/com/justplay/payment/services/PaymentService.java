@@ -2,9 +2,12 @@ package com.justplay.payment.services;
 
 import com.justplay.payment.model.OrderCreateRequest;
 import com.justplay.payment.model.OrderResponse;
+import com.justplay.payment.model.RefundRequest;
+import com.justplay.payment.model.RefundResponse;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+import com.razorpay.Refund;
 import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -51,5 +54,24 @@ public class PaymentService {
         } catch (RazorpayException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public RefundResponse initiateRefund(RefundRequest refundRequest) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("amount", refundRequest.getAmount().multiply(new BigDecimal(100)));
+        jsonObject.put("speed","optimum");
+        jsonObject.put("receipt", refundRequest.getOrderId());
+        Refund refund;
+        try {
+          refund = client.payments.refund(refundRequest.getPaymentId(), jsonObject);
+        } catch (RazorpayException e) {
+            throw new RuntimeException(e);
+        }
+        RefundResponse refundResponse = new RefundResponse();
+        refundResponse.setRefundId(refund.get("id"));
+        refundResponse.setPaymentId(refundRequest.getPaymentId());
+        refundResponse.setAmount(refundRequest.getAmount());
+        refundResponse.setOrderId(refundRequest.getOrderId());
+        return refundResponse;
     }
 }
